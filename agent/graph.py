@@ -7,7 +7,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 from agent.nodes import agent_node
 from agent.state import AgentState
-from agent.tools import consultar_base_conocimiento
+from agent.tools import consultar_base_conocimiento, radicar_ticket
 
 def _tools_condition(state: AgentState):
     """Wrapper para tools_condition con messages_key por defecto."""
@@ -22,7 +22,7 @@ def create_app(checkpointer=None):
     if checkpointer is None:
         checkpointer = MemorySaver()
 
-    tools = [consultar_base_conocimiento]
+    tools = [consultar_base_conocimiento, radicar_ticket]
     tool_node = ToolNode(tools)
 
     workflow = StateGraph(AgentState)
