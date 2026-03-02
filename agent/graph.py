@@ -12,12 +12,14 @@ from agent.tools import consultar_base_conocimiento, radicar_ticket
 
 def _route_after_tools(state: AgentState) -> str:
     """Enruta a sentiment si se llamó radicar_ticket, sino vuelve al agente."""
-    last_message = state.get("messages", [])[-1]
-    if isinstance(last_message, AIMessage) and getattr(last_message, "tool_calls", None):
-        for tc in last_message.tool_calls:
-            name = tc.get("name", "") if isinstance(tc, dict) else getattr(tc, "name", "")
-            if name == "radicar_ticket":
-                return "sentiment"
+    messages = state.get("messages", [])
+    for msg in reversed(messages):
+        if isinstance(msg, AIMessage) and getattr(msg, "tool_calls", None):
+            for tc in msg.tool_calls:
+                name = tc.get("name", "") if isinstance(tc, dict) else getattr(tc, "name", "")
+                if name == "radicar_ticket":
+                    return "sentiment"
+            break
     return "agent"
 
 

@@ -10,6 +10,7 @@ from agent.state import AgentState
 def sentiment_node(state: AgentState) -> dict:
     """Clasifica el sentimiento del usuario tras radicar un ticket.
     Usa el motivo o los últimos mensajes del usuario para el análisis."""
+    print("[NODO] Sentiment: Ejecutando...")
     messages = state.get("messages", [])
     texto_analizar = None
 
