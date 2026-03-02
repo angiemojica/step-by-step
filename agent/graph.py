@@ -5,9 +5,21 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
-from agent.nodes import agent_node
+from agent.nodes import agent_node, sentiment_node
 from agent.state import AgentState
 from agent.tools import consultar_base_conocimiento, radicar_ticket
+
+
+def _route_after_tools(state: AgentState) -> str:
+    """Enruta a sentiment si se llamó radicar_ticket, sino vuelve al agente."""
+    last_message = state.get("messages", [])[-1]
+    if isinstance(last_message, AIMessage) and getattr(last_message, "tool_calls", None):
+        for tc in last_message.tool_calls:
+            name = tc.get("name", "") if isinstance(tc, dict) else getattr(tc, "name", "")
+            if name == "radicar_ticket":
+                return "sentiment"
+    return "agent"
+
 
 def _tools_condition(state: AgentState):
     """Wrapper para tools_condition con messages_key por defecto."""
@@ -29,11 +41,17 @@ def create_app(checkpointer=None):
 
     workflow.add_node("agent", agent_node)
     workflow.add_node("tools", tool_node)
+    workflow.add_node("sentiment", sentiment_node)
 
     workflow.set_entry_point("agent")
 
     workflow.add_conditional_edges("agent", _tools_condition, {"tools": "tools", "__end__": END})
-    workflow.add_edge("tools", "agent")
+    workflow.add_conditional_edges(
+        "tools",
+        _route_after_tools,
+        {"sentiment": "sentiment", "agent": "agent"},
+    )
+    workflow.add_edge("sentiment", "agent")
 
     return workflow.compile(checkpointer=checkpointer)
 
