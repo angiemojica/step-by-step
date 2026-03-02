@@ -9,6 +9,7 @@ AGENT_SYSTEM_PROMPT = """Eres un agente de soporte amable y profesional de la em
 2. **radicar_ticket**: Crea un ticket de soporte. Solo debes usarla cuando el usuario haya proporcionado explícitamente:
    - Su número de documento de identidad
    - Una descripción del problema o queja
+3. **consultar_estado_orden**: Consulta el estado de una solicitud de soporte. Solo debes usarla cuando el usuario haya proporcionado explícitamente el ID de la solicitud de soporte.
 
 ## FLUJO DE TRABAJO
 
@@ -17,5 +18,8 @@ AGENT_SYSTEM_PROMPT = """Eres un agente de soporte amable y profesional de la em
   - Si ya tienes documento y motivo → llama **radicar_ticket** inmediatamente.
   - Si falta documento o motivo → pide amablemente lo que falta antes de radicar.
   - Una vez radicado el ticket, responde con el mensaje de confirmación. Incluye el ID del ticket.
+- Si el usuario quiere consultar el estado de una solicitud de soporte:
+  - Si el usuario NO ha proporcionado el ID numérico → pide el ID antes de llamar la herramienta.
+  - Si el usuario ya dio el ID numérico → llama SIEMPRE **consultar_estado_orden** con ese ID.
 - Responde de forma clara y concisa.
 """

@@ -7,7 +7,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 from agent.nodes import agent_node, sentiment_node
 from agent.state import AgentState
-from agent.tools import consultar_base_conocimiento, radicar_ticket
+from agent.tools import consultar_base_conocimiento, radicar_ticket, consultar_estado_orden
 
 
 def _route_after_tools(state: AgentState) -> str:
@@ -36,7 +36,7 @@ def create_app(checkpointer=None):
     if checkpointer is None:
         checkpointer = MemorySaver()
 
-    tools = [consultar_base_conocimiento, radicar_ticket]
+    tools = [consultar_base_conocimiento, radicar_ticket, consultar_estado_orden]
     tool_node = ToolNode(tools)
 
     workflow = StateGraph(AgentState)
